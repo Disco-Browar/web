@@ -2,7 +2,6 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useAppStore } from "@/lib/store";
 import MobileLayout from "@/components/MobileLayout";
 import {
   Title,
@@ -17,22 +16,9 @@ import { FingerprintIcon, ShieldCheckIcon, BadgeIcon } from "lucide-react";
 
 export default function LoginContent() {
   const router = useRouter();
-  const setUser = useAppStore((state) => state.setUser);
 
   const handleMObywatelLogin = () => {
-    // Symulacja logowania przez mObywatel
-    setUser({
-      id: "u123",
-      name: "Jan Kowalski",
-      pesel: "85010112345",
-      region: "mazowieckie",
-      interests: ["drogi", "środowisko", "edukacja"],
-    });
-
-    // Lekkie opóźnienie dla lepszego feelu
-    setTimeout(() => {
-      router.push("/dashboard");
-    }, 600);
+    router.push("/mobywatel-login");
   };
 
   return (
@@ -67,7 +53,6 @@ export default function LoginContent() {
             >
               <FingerprintIcon size={42} color="white" />
             </div>
-
             <Title order={2} ta="center" mb={6}>
               Uwierzytelnienie
             </Title>
@@ -76,7 +61,7 @@ export default function LoginContent() {
             </Text>
           </div>
 
-          {/* Główny przycisk mObywatel */}
+          {/* GŁÓWNY PRZYCISK – teraz przekierowuje */}
           <Button
             fullWidth
             size="xl"
@@ -106,7 +91,7 @@ export default function LoginContent() {
             w="100%"
           />
 
-          {/* Pozostałe opcje */}
+          {/* Pozostałe opcje (na razie dekoracyjne – można później podpiąć) */}
           <Stack gap="sm" w="100%">
             <Paper shadow="sm" p="md" radius="md" withBorder>
               <Group wrap="nowrap">
@@ -133,7 +118,7 @@ export default function LoginContent() {
             </Paper>
           </Stack>
 
-          {/* Stopka z regulaminem */}
+          {/* Stopka */}
           <Text size="xs" c="dimmed" ta="center" style={{ marginTop: "30px" }}>
             Logując się, akceptujesz regulamin serwisu.
             <br />

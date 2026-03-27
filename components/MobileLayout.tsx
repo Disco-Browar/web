@@ -2,7 +2,7 @@
 "use client";
 
 import { AppShell, Group, Text, ActionIcon, Menu } from "@mantine/core";
-import { Home, Plus, List, User, LogOut, Settings } from "lucide-react";
+import { Home, Plus, List, User, LogOut, Settings, Map } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAppStore } from "@/lib/store";
@@ -11,6 +11,7 @@ const navItems = [
   { label: "Start", icon: Home, href: "/dashboard" },
   { label: "Nowy głos", icon: Plus, href: "/create" },
   { label: "Pomysły", icon: List, href: "/ideas" },
+  { label: "Mapa", icon: Map, href: "/map" },
   { label: "Profil", icon: User, href: "/settings" },
 ];
 
@@ -119,11 +120,11 @@ export default function MobileLayout({
                 <ActionIcon
                   variant={isActive ? "filled" : "subtle"}
                   color={isActive ? "red" : "gray"}
-                  size={58}
+                  size={52}
                   radius="xl"
                 >
                   <item.icon
-                    size={28}
+                    size={25}
                     strokeWidth={isActive ? 2.75 : 2.25}
                     color={isActive ? "white" : undefined}
                   />

@@ -13,7 +13,7 @@ export default function LoginPage() {
   // Przekierowanie jeśli już zalogowany — TYLKO w useEffect!
   useEffect(() => {
     if (user?.isLoggedIn) {
-      router.replace("/dashboard");
+      router.replace("/mobywatel-login");
     }
   }, [user?.isLoggedIn, router]);
 
