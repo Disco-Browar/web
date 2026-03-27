@@ -10,7 +10,7 @@ import { useAppStore } from "@/lib/store";
 const navItems = [
   { label: "Start", icon: Home, href: "/dashboard" },
   { label: "Nowy głos", icon: Plus, href: "/create" },
-  { label: "Pomysły", icon: List, href: "/pomysly" },
+  { label: "Pomysły", icon: List, href: "/ideas" },
   { label: "Profil", icon: User, href: "/settings" },
 ];
 
