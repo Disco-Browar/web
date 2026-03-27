@@ -7,14 +7,14 @@ export type User = {
   name: string;
   pesel?: string;
   region: string;
-  interests: string[];
+  interests: string[]; // backend zwraca string, zamieniamy na tablicę
   isLoggedIn: boolean;
 };
 
 type AppState = {
   user: User | null;
-
-  setUser: (user: Omit<User, "isLoggedIn">) => void;
+  token: string | null; // ← NOWE
+  setAuth: (token: string, userData: any) => void; // ← wygodniejsza akcja
   logout: () => void;
   updateInterests: (interests: string[]) => void;
   updateRegion: (region: string) => void;
@@ -24,15 +24,31 @@ export const useAppStore = create<AppState>()(
   persist(
     (set, get) => ({
       user: null,
+      token: null,
 
-      setUser: (userData) =>
+      setAuth: (token: string, userData: any) => {
+        const interests =
+          typeof userData.interests === "string"
+            ? userData.interests.split(",").map((i: string) => i.trim())
+            : Array.isArray(userData.interests)
+              ? userData.interests
+              : [];
+
         set({
-          user: { ...userData, isLoggedIn: true },
-        }),
+          token,
+          user: {
+            id: String(userData.id),
+            name: userData.name,
+            pesel: userData.pesel,
+            region: userData.region,
+            interests,
+            isLoggedIn: true,
+          },
+        });
+      },
 
       logout: () => {
-        set({ user: null });
-        // Przekierowanie po wylogowaniu zrobimy w komponencie, bo w store nie mamy routera
+        set({ user: null, token: null });
       },
 
       updateInterests: (interests) =>

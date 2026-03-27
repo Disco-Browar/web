@@ -1,23 +1,40 @@
 // app/page.tsx
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAppStore } from "@/lib/store";
+import { Loader, Center } from "@mantine/core";
 
 export default function HomePage() {
   const router = useRouter();
   const user = useAppStore((state) => state.user);
   const isLoggedIn = !!user?.isLoggedIn;
 
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
-    if (isLoggedIn) {
-      router.replace("/dashboard");
-    } else {
-      router.replace("/login");
-    }
+    // Czekamy aż store się "ustabilizuje" (szczególnie ważne jeśli persist)
+    const timer = setTimeout(() => {
+      if (isLoggedIn) {
+        router.replace("/dashboard");
+      } else {
+        router.replace("/login");
+      }
+      setIsLoading(false);
+    }, 100); // mały delay pomaga uniknąć race condition
+
+    return () => clearTimeout(timer);
   }, [isLoggedIn, router]);
 
-  // Podczas przekierowania pokazujemy pustą stronę (lub loader)
-  return null;
+  // Pokazujemy loader dopóki nie zdecydujemy dokąd iść
+  if (isLoading) {
+    return (
+      <Center style={{ minHeight: "100dvh" }}>
+        <Loader size="xl" />
+      </Center>
+    );
+  }
+
+  return null; // nigdy nie powinno dojść tutaj
 }
