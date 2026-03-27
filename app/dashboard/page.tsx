@@ -1,41 +1,46 @@
+// app/dashboard/page.tsx
 "use client";
 
-import { useState } from "react";
-import { Stepper, Button, Group } from "@mantine/core";
-import MobileLayout from "@/components/MobileLayout";
+import { Container, Grid, Text, Stack } from "@mantine/core";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import MobileLayout from "@/components/MobileLayout";
 
-export default function Dashboard() {
-  const [active, setActive] = useState(1);
-  const nextStep = () =>
-    setActive((current) => (current < 3 ? current + 1 : current));
-  const prevStep = () =>
-    setActive((current) => (current > 0 ? current - 1 : current));
+import DashboardHeader from "@/components/dashboard/DashboardHeader";
+import StatusCards from "@/components/dashboard/StatusCards";
+import RecommendedPetition from "@/components/dashboard/RecommendedPetition";
 
+export default function DashboardPage() {
   return (
     <ProtectedRoute>
       <MobileLayout>
-        <Stepper active={active} onStepClick={setActive}>
-          <Stepper.Step label="First step" description="Create an account">
-            Step 1 content: Create an account
-          </Stepper.Step>
-          <Stepper.Step label="Second step" description="Verify email">
-            Step 2 content: Verify email
-          </Stepper.Step>
-          <Stepper.Step label="Final step" description="Get full access">
-            Step 3 content: Get full access
-          </Stepper.Step>
-          <Stepper.Completed>
-            Completed, click back button to get to previous step
-          </Stepper.Completed>
-        </Stepper>
+        <Container size="xl" py="xl">
+          <DashboardHeader name="Jan Kowalski" />
 
-        <Group justify="center" mt="xl">
-          <Button variant="default" onClick={prevStep}>
-            Back
-          </Button>
-          <Button onClick={nextStep}>Next step</Button>
-        </Group>
+          <StatusCards />
+
+          <Text fw={700} size="xl" mb="lg">
+            Rekomendowane dla Ciebie
+          </Text>
+
+          <Stack gap="xl">
+            <RecommendedPetition
+              title="Rewitalizacja Parku Skaryszewskiego - Etap II"
+              description="Dodanie ścieżek edukacyjnych i nowoczesnego oświetlenia LED."
+              signatures={8.4}
+              progress={84}
+              target="Rada Miasta"
+              isHighMatch={true}
+            />
+
+            <RecommendedPetition
+              title="Zwiększenie liczby kursów linii 523 w godzinach szczytu"
+              description="Mieszkańcy Bemowa postulują o częstsze kursy między 7:00 a 9:00."
+              signatures={1.2}
+              progress={24}
+              target="ZTM Warszawa"
+            />
+          </Stack>
+        </Container>
       </MobileLayout>
     </ProtectedRoute>
   );

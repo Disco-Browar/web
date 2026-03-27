@@ -11,7 +11,7 @@ const navItems = [
   { label: "Start", icon: Home, href: "/dashboard" },
   { label: "Nowy głos", icon: Plus, href: "/nowy-pomysl" },
   { label: "Pomysły", icon: List, href: "/pomysly" },
-  { label: "Profil", icon: User, href: "/profil" },
+  { label: "Profil", icon: User, href: "/settings" },
 ];
 
 export default function MobileLayout({
@@ -28,6 +28,10 @@ export default function MobileLayout({
   if (!isLoggedIn) {
     return <>{children}</>;
   }
+
+  const handleSettings = () => {
+    window.location.href = "/settings";
+  };
 
   const handleLogout = () => {
     logout();
@@ -67,7 +71,10 @@ export default function MobileLayout({
                 </Text>
               </Menu.Item>
               <Menu.Divider />
-              <Menu.Item leftSection={<Settings size={16} />}>
+              <Menu.Item
+                leftSection={<Settings size={16} />}
+                onClick={handleSettings}
+              >
                 Ustawienia profilu
               </Menu.Item>
               <Menu.Item
