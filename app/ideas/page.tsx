@@ -17,6 +17,34 @@ import PetitionCard from "@/components/ideas/PetitionCard";
 import { useState, useEffect } from "react";
 import { useAppStore } from "@/lib/store";
 
+// Dodaj do importów
+import {
+  Modal,
+  Stepper,
+  Textarea,
+  Badge,
+  Group,
+  Stack,
+  Paper,
+  TextInput,
+  Divider,
+  ActionIcon,
+} from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+import {
+  Bot,
+  Mic,
+  MicOff,
+  Send,
+  CheckCircle,
+  Building2,
+  FileText,
+  Users,
+} from "lucide-react";
+import NewIdeaModal from "@/components/ideas/NewIdeaModal";
+
+const AI_BASE = "http://127.0.0.1:8080";
+
 const API_BASE = "http://localhost:4000";
 
 const CATEGORY_MAP: Record<string, string> = {
@@ -49,6 +77,7 @@ export default function IdeasPage() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [modalOpened, { open, close }] = useDisclosure(false);
 
   const fetchPosts = async () => {
     setLoading(true);
@@ -98,13 +127,13 @@ export default function IdeasPage() {
     return matchRegion && matchCategory;
   });
 
-
-  const newIdea(){
-    return 1
-  };
-
   return (
     <MobileLayout>
+      <NewIdeaModal
+        opened={modalOpened}
+        onClose={close}
+        onPublished={fetchPosts}
+      />
       <div className="min-h-screen bg-gray-50 pb-20">
         <Container size="md" className="px-4 pt-2">
           <Title order={1} className="text-2xl font-bold text-gray-900 mb-1">
@@ -116,16 +145,9 @@ export default function IdeasPage() {
             Twój głos kształtuje przyszłość Rzeczypospolitej.
           </Text>
 
-          
-
           {/* Filtry */}
           <div className="flex flex-col gap-3 mb-8 mt-4">
-
-            <Button
-              radius="md"
-              onClick={newIdea}
-              leftSection={<Plus size={22} />}
-            >
+            <Button radius="md" onClick={open} leftSection={<Plus size={22} />}>
               Nowy Pomysł
             </Button>
 
@@ -165,7 +187,6 @@ export default function IdeasPage() {
             >
               Szukaj
             </Button>
-
           </div>
 
           {/* Stany */}

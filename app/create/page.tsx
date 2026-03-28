@@ -26,6 +26,7 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import MobileLayout from "@/components/MobileLayout";
 import { useRouter } from "next/navigation";
 import { useAppStore } from "@/lib/store";
+import TypingMessage from "@/components/TypingMessage";
 
 const AI_BASE = "http://127.0.0.1:8080";
 
@@ -58,20 +59,27 @@ export default function NowyWniosekPage() {
 
   // Pobierz lokalizację przy wejściu na stronę
   useEffect(() => {
+    console.log("useEffect odpala się");
+    console.log("navigator.geolocation:", navigator.geolocation);
+
     if (!navigator.geolocation) {
-      setLocationError("Przeglądarka nie obsługuje geolokalizacji.");
+      setLocation({ lat: 53.1235, lng: 18.0084 }); // Bydgoszcz
+      // setLocation({ lat: 73.45894735069872, lng: 127.04658508300783 });
       return;
     }
+
+    console.log("Wywołuję getCurrentPosition...");
+
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        console.log(pos);
+        console.log("Sukces:", pos.coords);
         setLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
       },
-      () => {
-        setLocationError(
-          "Brak dostępu do lokalizacji. Możesz kontynuować bez niej.",
-        );
+      (err) => {
+        console.log("Błąd geolocation:", err.code, err.message);
+        setLocationError("Brak dostępu do lokalizacji.");
       },
+      { timeout: 10000, enableHighAccuracy: false },
     );
   }, []);
 
@@ -263,7 +271,11 @@ export default function NowyWniosekPage() {
                         whiteSpace: "pre-wrap",
                       }}
                     >
-                      {msg.text}
+                      {msg.role === "assistant" && i === messages.length - 1 ? (
+                        <TypingMessage text={msg.text} />
+                      ) : (
+                        msg.text
+                      )}
                     </div>
                   </div>
                 ))}

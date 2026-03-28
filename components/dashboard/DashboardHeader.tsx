@@ -6,8 +6,12 @@ import { useRouter } from "next/navigation";
 export default function DashboardHeader({ name = "Jan Kowalski" }) {
   const router = useRouter();
 
-  function dodajNowy() {
+  function opiszSwoj() {
     router.push("/create");
+  }
+
+  function dodajNowy() {
+    router.push("/ideas");
   }
 
   return (
@@ -29,6 +33,7 @@ export default function DashboardHeader({ name = "Jan Kowalski" }) {
           radius="xl"
           leftSection={<EditIcon size={20} />}
           color="blue"
+          onClick={opiszSwoj}
         >
           Opisz swój problem
         </Button>

@@ -2,14 +2,23 @@
 "use client";
 
 import { AppShell, Group, Text, ActionIcon, Menu } from "@mantine/core";
-import { Home, Plus, List, User, LogOut, Settings, Map } from "lucide-react";
+import {
+  Home,
+  Plus,
+  List,
+  User,
+  LogOut,
+  Settings,
+  Map,
+  Bot,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAppStore } from "@/lib/store";
 
 const navItems = [
   { label: "Start", icon: Home, href: "/dashboard" },
-  { label: "Problem", icon: Plus, href: "/create" },
+  { label: "Asystent", icon: Bot, href: "/create" },
   { label: "Pomysły", icon: List, href: "/ideas" },
   { label: "Mapa", icon: Map, href: "/map" },
   { label: "Profil", icon: User, href: "/settings" },
