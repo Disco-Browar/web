@@ -27,7 +27,7 @@ import MobileLayout from "@/components/MobileLayout";
 import { useRouter } from "next/navigation";
 import { useAppStore } from "@/lib/store";
 
-const AI_BASE = "http://127.0.0.1:8000";
+const AI_BASE = "http://127.0.0.1:8080";
 
 type Message = {
   role: "user" | "assistant";
@@ -64,6 +64,7 @@ export default function NowyWniosekPage() {
     }
     navigator.geolocation.getCurrentPosition(
       (pos) => {
+        console.log(pos);
         setLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
       },
       () => {

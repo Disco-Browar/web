@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Container,
@@ -82,6 +82,12 @@ export default function OnboardingPage() {
   );
 
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (user?.region && user?.interests?.length > 0) {
+      router.replace("/dashboard");
+    }
+  }, []);
 
   const toggleInterest = (id: string) => {
     setSelectedInterests((prev) =>

@@ -1,7 +1,7 @@
 // app/mobywatel-login/page.tsx
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Box,
@@ -29,6 +29,13 @@ export default function MobywatelLoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const { user } = useAppStore();
+  useEffect(() => {
+    if (user?.isLoggedIn) {
+      router.replace("/dashboard");
+    }
+  }, [user]);
 
   const handleLogin = async () => {
     if (pesel.length !== 11) {
