@@ -1,88 +1,113 @@
 "use client";
 
 import MobileLayout from "@/components/MobileLayout";
-import { Container, Title, Text, Select, SimpleGrid, Button } from "@mantine/core";
-import { Filter, Search } from 'lucide-react';
+import {
+  Container,
+  Title,
+  Text,
+  Select,
+  SimpleGrid,
+  Button,
+  Loader,
+  Center,
+  Alert,
+} from "@mantine/core";
+import { Filter, Search } from "lucide-react";
 import PetitionCard from "@/components/ideas/PetitionCard";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAppStore } from "@/lib/store";
 
-const mockPetitions = [
-  {
-    id: "1",
-    category: "EKOLOGIA" as const,
-    title: "Zalesienie nieużytków w gminach podmiejskich",
-    description: "Proponujemy automatyczne przekwalifikowanie gruntów IV-VI klasy nieużytkowanych od 10 lat na...",
-    author: "Aneta Kowalska",
-    authorVerified: true,
-    progress: 82,
-    signaturesNeeded: 1800,
-  },
-  {
-    id: "2",
-    category: "TRANSPORT" as const,
-    title: "Budowa ścieżki rowerowej wzdłuż drogi wojewódzkiej 721",
-    description: "AI wyliczyło, że ta inwestycja skróci czas dojazdu do pracy dla 12,000 mieszkańców o średnio 15 minut...",
-    author: "Marek Wiśniewski",
-    authorVerified: true,
-    progress: 45,
-    signaturesNeeded: 5500,
-  },
-  {
-    id: "3",
-    category: "EDUKACJA" as const,
-    title: "Wprowadzenie lekcji z zakresu kompetencji cyfrowych AI",
-    description: "Inicjatywa ma na celu przygotowanie uczniów szkół średnich do efektywnej i bezpiecznej współpracy z systemami...",
-    author: "Piotr Zieliński",
-    authorVerified: true,
-    progress: 95,
-    signaturesNeeded: 500,
-  },
-  {
-    id: "4",
-    category: "ZDROWIE" as const,
-    title: "Program profilaktyki zdrowia psychicznego dla młodzieży",
-    description: "Wprowadzenie ogólnopolskiego systemu wsparcia psychologicznego dostępnego bez skierowania dla os...",
-    author: "dr Maria Nowak",
-    authorVerified: true,
-    progress: 22,
-    signaturesNeeded: 7800,
-  },
-  {
-    id: "5",
-    category: "INFRASTRUKTURA" as const,
-    title: 'Rewitalizacja parku miejskiego "Ostoja" w Tarnowie',
-    description: "Projekt zakłada budowę nowoczesnego placu zabaw, tężni solankowej oraz strefy co-working...",
-    author: "Janusz Piekarski",
-    authorVerified: true,
-    progress: 58,
-    signaturesNeeded: 4200,
-  },
-  {
-    id: "6",
-    category: "CYFRYZACJA" as const,
-    title: "Wprowadzenie ogólnopolskiego portfela cyfrowych tożsamości",
-    description: "Umożliwienie obywatelom pełnej kontroli nad swoimi danymi osobowymi przy użyciu technologii...",
-    author: "Katarzyna Nowak",
-    authorVerified: true,
-    progress: 38,
-    signaturesNeeded: 1200,
-  },
-];
+const API_BASE = "http://localhost:4000";
+
+const CATEGORY_MAP: Record<string, string> = {
+  transport: "TRANSPORT",
+  edukacja: "EDUKACJA",
+  ekologia: "EKOLOGIA",
+  zdrowie: "ZDROWIE",
+  infrastruktura: "INFRASTRUKTURA",
+  technologia: "CYFRYZACJA",
+  bezpieczenstwo: "INFRASTRUKTURA",
+};
+
+type Post = {
+  id: number;
+  title: string;
+  content: string;
+  aiSummary: string | null;
+  category: string;
+  region: string;
+  createdAt: string;
+  userId: number;
+  user: { id: number; name: string };
+  _count: { votes: number };
+};
 
 export default function IdeasPage() {
+  const { token } = useAppStore();
   const [region, setRegion] = useState("Cała Polska");
   const [categoryFilter, setCategoryFilter] = useState("Wszystkie kategorie");
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const fetchPosts = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const res = await fetch(`${API_BASE}/posts`);
+      if (!res.ok) throw new Error("Błąd pobierania postów");
+      const data: Post[] = await res.json();
+      setPosts(data);
+    } catch (err: any) {
+      setError(err.message || "Błąd połączenia z serwerem");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPosts();
+  }, []);
+
+  const handleVote = async (postId: number, value: 1 | -1) => {
+    if (!token) return;
+    try {
+      await fetch(`${API_BASE}/posts/${postId}/vote`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ value }),
+      });
+      fetchPosts(); // odśwież po głosowaniu
+    } catch (err) {
+      console.error("Błąd głosowania", err);
+    }
+  };
+
+  const filteredPosts = posts.filter((post) => {
+    const matchRegion =
+      region === "Cała Polska" ||
+      post.region.toLowerCase() === region.toLowerCase();
+    const mappedCategory =
+      CATEGORY_MAP[post.category] ?? post.category.toUpperCase();
+    const matchCategory =
+      categoryFilter === "Wszystkie kategorie" ||
+      mappedCategory === categoryFilter;
+    return matchRegion && matchCategory;
+  });
 
   return (
     <MobileLayout>
       <div className="min-h-screen bg-gray-50 pb-20">
         <Container size="md" className="px-4 pt-2">
-          {/* Nagłówek */}
           <Title order={1} className="text-2xl font-bold text-gray-900 mb-1">
             Petycje Społeczne
           </Title>
           <Text c="dimmed" size="sm" className="mb-8 leading-relaxed">
-            Przeglądaj, wspieraj i współtwórz inicjatywy obywatelskie.<br />
+            Przeglądaj, wspieraj i współtwórz inicjatywy obywatelskie.
+            <br />
             Twój głos kształtuje przyszłość Rzeczypospolitej.
           </Text>
 
@@ -93,19 +118,19 @@ export default function IdeasPage() {
               onChange={(val) => setRegion(val || "Cała Polska")}
               data={[
                 "Cała Polska",
-                "Mazowieckie",
-                "Małopolskie",
-                "Śląskie",
-                "Wielkopolskie",
+                "mazowieckie",
+                "malopolskie",
+                "slaskie",
+                "wielkopolskie",
               ]}
               leftSection={<Filter size={18} />}
-              className="flex-1"
               size="md"
             />
-
             <Select
               value={categoryFilter}
-              onChange={(val) => setCategoryFilter(val || "Wszystkie kategorie")}
+              onChange={(val) =>
+                setCategoryFilter(val || "Wszystkie kategorie")
+              }
               data={[
                 "Wszystkie kategorie",
                 "EKOLOGIA",
@@ -115,34 +140,59 @@ export default function IdeasPage() {
                 "INFRASTRUKTURA",
                 "CYFRYZACJA",
               ]}
-              className="flex-1"
               size="md"
             />
-
-            <Button radius="md" className="bg-blue-500">
-              <Search size={22} />
+            <Button
+              radius="md"
+              onClick={fetchPosts}
+              leftSection={<Search size={22} />}
+            >
               Szukaj
             </Button>
           </div>
 
-          {/* Lista petycji */}
-          <SimpleGrid cols={1} spacing="lg">
-            {mockPetitions.map((petition) => (
-              <PetitionCard
-                key={petition.id}
-                category={petition.category}
-                title={petition.title}
-                description={petition.description}
-                author={petition.author}
-                authorVerified={petition.authorVerified}
-                progress={petition.progress}
-                signaturesNeeded={petition.signaturesNeeded}
-                onSupport={() => console.log("Popieram:", petition.title)}
-                onDislike={() => console.log("Odrzucam:", petition.title)}
-                onComment={() => console.log("Poprawka:", petition.title)}
-              />
-            ))}
-          </SimpleGrid>
+          {/* Stany */}
+          {loading && (
+            <Center py="xl">
+              <Loader color="red" />
+            </Center>
+          )}
+
+          {error && (
+            <Alert color="red" mb="md" radius="md">
+              {error}
+            </Alert>
+          )}
+
+          {!loading && !error && filteredPosts.length === 0 && (
+            <Center py="xl">
+              <Text c="dimmed">Brak petycji spełniających kryteria.</Text>
+            </Center>
+          )}
+
+          {/* Lista postów */}
+          {!loading && (
+            <SimpleGrid cols={1} spacing="lg">
+              {filteredPosts.map((post) => (
+                <PetitionCard
+                  key={post.id}
+                  category={
+                    (CATEGORY_MAP[post.category] ??
+                      post.category.toUpperCase()) as any
+                  }
+                  title={post.title}
+                  description={post.aiSummary || post.content}
+                  author={post.user?.name ?? "Anonimowy"}
+                  authorVerified={true}
+                  progress={Math.min(100, (post._count.votes / 10) * 100)}
+                  signaturesNeeded={10}
+                  onSupport={() => handleVote(post.id, 1)}
+                  onDislike={() => handleVote(post.id, -1)}
+                  onComment={() => console.log("Poprawka:", post.title)}
+                />
+              ))}
+            </SimpleGrid>
+          )}
         </Container>
       </div>
     </MobileLayout>

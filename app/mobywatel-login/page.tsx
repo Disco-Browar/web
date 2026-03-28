@@ -56,25 +56,25 @@ export default function MobywatelLoginPage() {
       }
 
       // 2. Jeśli nie udało się (401 lub user nie istnieje) → rejestrujemy automatycznie
-      const demoName = `Użytkownik ${pesel.slice(-4)}`;
+      // const demoName = `Użytkownik ${pesel.slice(-4)}`;
 
-      const registerPayload = {
-        pesel,
-        name: demoName,
-        password: password || "123456", // fallback na demo
-        region: "mazowieckie",
-        interests: "transport,edukacja,środowisko", // backend przyjmuje string
-      };
+      // const registerPayload = {
+      //   pesel,
+      //   name: demoName,
+      //   password: password || "123456", // fallback na demo
+      //   region: "mazowieckie",
+      //   interests: "transport,edukacja,środowisko", // backend przyjmuje string
+      // };
 
-      res = await fetch(`${API_BASE}/auth/register`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(registerPayload),
-      });
+      // res = await fetch(`${API_BASE}/auth/register`, {
+      //   method: "POST",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify(registerPayload),
+      // });
 
       if (!res.ok) {
         const errorData = await res.json();
-        throw new Error(errorData.message || "Nie udało się zarejestrować");
+        throw new Error(errorData.message || "Nie udało się zalogowac");
       }
 
       const data = await res.json();

@@ -7,17 +7,21 @@ export type User = {
   name: string;
   pesel?: string;
   region: string;
-  interests: string[]; // backend zwraca string, zamieniamy na tablicę
+  interests: string[]; // tablica
+  industries: string[]; // ← ZMIENIONE NA MNOGĄ
   isLoggedIn: boolean;
 };
 
 type AppState = {
   user: User | null;
-  token: string | null; // ← NOWE
-  setAuth: (token: string, userData: any) => void; // ← wygodniejsza akcja
+  token: string | null;
+
+  setAuth: (token: string, userData: any) => void;
   logout: () => void;
+
   updateInterests: (interests: string[]) => void;
   updateRegion: (region: string) => void;
+  updateIndustries: (industries: string[]) => void; // ← ZMIENIONA NA MNOGĄ
 };
 
 export const useAppStore = create<AppState>()(
@@ -34,6 +38,13 @@ export const useAppStore = create<AppState>()(
               ? userData.interests
               : [];
 
+        const industries =
+          typeof userData.industries === "string"
+            ? userData.industries.split(",").map((i: string) => i.trim())
+            : Array.isArray(userData.industries)
+              ? userData.industries
+              : [];
+
         set({
           token,
           user: {
@@ -42,6 +53,7 @@ export const useAppStore = create<AppState>()(
             pesel: userData.pesel,
             region: userData.region,
             interests,
+            industries, // ← dodane
             isLoggedIn: true,
           },
         });
@@ -59,6 +71,12 @@ export const useAppStore = create<AppState>()(
       updateRegion: (region) =>
         set((state) => ({
           user: state.user ? { ...state.user, region } : null,
+        })),
+
+      // ← NOWA AKCJA (mnoga)
+      updateIndustries: (industries) =>
+        set((state) => ({
+          user: state.user ? { ...state.user, industries } : null,
         })),
     }),
     { name: "twoj-glos-storage" },
