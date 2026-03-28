@@ -12,7 +12,7 @@ import {
   Center,
   Alert,
 } from "@mantine/core";
-import { Filter, Search } from "lucide-react";
+import { Filter, Search, Plus } from "lucide-react";
 import PetitionCard from "@/components/ideas/PetitionCard";
 import { useState, useEffect } from "react";
 import { useAppStore } from "@/lib/store";
@@ -98,6 +98,11 @@ export default function IdeasPage() {
     return matchRegion && matchCategory;
   });
 
+
+  const newIdea(){
+    return 1
+  };
+
   return (
     <MobileLayout>
       <div className="min-h-screen bg-gray-50 pb-20">
@@ -111,8 +116,19 @@ export default function IdeasPage() {
             Twój głos kształtuje przyszłość Rzeczypospolitej.
           </Text>
 
+          
+
           {/* Filtry */}
           <div className="flex flex-col gap-3 mb-8 mt-4">
+
+            <Button
+              radius="md"
+              onClick={newIdea}
+              leftSection={<Plus size={22} />}
+            >
+              Nowy Pomysł
+            </Button>
+
             <Select
               value={region}
               onChange={(val) => setRegion(val || "Cała Polska")}
@@ -149,6 +165,7 @@ export default function IdeasPage() {
             >
               Szukaj
             </Button>
+
           </div>
 
           {/* Stany */}
